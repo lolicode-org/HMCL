@@ -17,6 +17,7 @@
  */
 package org.jackhuang.hmcl.upgrade;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
@@ -29,6 +30,8 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 
 import static org.jackhuang.hmcl.setting.ConfigHolder.config;
+import static org.jackhuang.hmcl.util.Lang.*;
+import static org.jackhuang.hmcl.util.logging.Logger.LOG;
 
 public final class UpdateChecker {
     private UpdateChecker() {
@@ -99,28 +102,28 @@ public final class UpdateChecker {
     }
 
     public static void requestCheckUpdate(UpdateChannel channel, boolean preview) {
-//        Platform.runLater(() -> {
-//            if (isCheckingUpdate())
-//                return;
-//            checkingUpdate.set(true);
-//
-//            thread(() -> {
-//                RemoteVersion result = null;
-//                try {
-//                    result = checkUpdate(channel, preview);
-//                    LOG.info("Latest version (" + channel + ", preview=" + preview + ") is " + result);
-//                } catch (IOException e) {
-//                    LOG.warning("Failed to check for update", e);
-//                }
-//
-//                RemoteVersion finalResult = result;
-//                Platform.runLater(() -> {
-//                    checkingUpdate.set(false);
-//                    if (finalResult != null) {
-//                        latestVersion.set(finalResult);
-//                    }
-//                });
-//            }, "Update Checker", true);
-//        });
+        Platform.runLater(() -> {
+            if (isCheckingUpdate())
+                return;
+            checkingUpdate.set(true);
+
+            thread(() -> {
+                RemoteVersion result = null;
+                try {
+                    result = checkUpdate(channel, preview);
+                    LOG.info("Latest version (" + channel + ", preview=" + preview + ") is " + result);
+                } catch (IOException e) {
+                    LOG.warning("Failed to check for update", e);
+                }
+
+                RemoteVersion finalResult = result;
+                Platform.runLater(() -> {
+                    checkingUpdate.set(false);
+                    if (finalResult != null) {
+                        latestVersion.set(finalResult);
+                    }
+                });
+            }, "Update Checker", true);
+        });
     }
 }
