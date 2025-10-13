@@ -40,7 +40,7 @@ if (buildNumber != null) {
         "$versionRoot.$buildNumber"
     }
 } else {
-    val shortCommit = System.getenv("GITHUB_SHA")?.lowercase()?.substring(0, 7)
+    val shortCommit = currentGitShortSha()
     version = if (shortCommit.isNullOrBlank()) {
         "$versionRoot.SNAPSHOT"
     } else if (isOfficial) {
@@ -67,6 +67,21 @@ dependencies {
 }
 
 fun digest(algorithm: String, bytes: ByteArray): ByteArray = MessageDigest.getInstance(algorithm).digest(bytes)
+
+fun currentGitShortSha(len: Int = 7): String? {
+    val envSha = System.getenv("GITHUB_SHA")?.lowercase()?.take(len)
+    if (!envSha.isNullOrBlank()) return envSha
+
+    return try {
+        val proc = ProcessBuilder("git", "rev-parse", "--short=$len", "HEAD")
+            .redirectErrorStream(true)
+            .start()
+        val output = proc.inputStream.bufferedReader().readText().trim().lowercase()
+        output.takeIf { it.isNotBlank() }
+    } catch (_: Exception) {
+        null
+    }
+}
 
 fun createChecksum(file: File) {
     val algorithms = linkedMapOf(
