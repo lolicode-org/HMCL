@@ -158,7 +158,7 @@ public final class LocaleUtils {
             if (isChinese(locale)) {
                 if (CHINESE_LATN_VARIANTS.contains(locale.getVariant()))
                     return "Latn";
-                if (locale.getLanguage().equals("lzh") || CHINESE_TRADITIONAL_REGIONS.contains(locale.getCountry()))
+                if (CHINESE_TRADITIONAL_REGIONS.contains(locale.getCountry()))
                     return "Hant";
                 else
                     return "Hans";
