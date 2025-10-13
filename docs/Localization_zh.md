@@ -18,7 +18,6 @@ HMCL 为多种语言提供本地化支持。
 | 英语 (颠倒) | `en-Qabs` | `en-Qabs` | `en_Qabs`  | `en_ud`                                     | 自动     |                                           |  
 | 中文 (简体) | `zh-Hans` | `zh`      | `_zh`      | `zh_cn`                                     | **主要** | [Glavo](https://github.com/Glavo)         |
 | 中文 (繁体) | `zh-Hant` | `zh-Hant` | `_zh_Hant` | `zh_tw` <br/> `zh_hk`                       | **主要** | [Glavo](https://github.com/Glavo)         |
-| 中文 (文言) | `lzh`     | `lzh`     | `_lzh`     | `lzh`                                       | 次要     |                                           |
 | 日语      | `ja`      | `ja`      | `_ja`      | `ja_jp`                                     | 次要     |                                           |
 | 西班牙语    | `es`      | `es`      | `_es`      | `es_es`                                     | 次要     | [3gf8jv4dv](https://github.com/3gf8jv4dv) |
 | 俄语      | `ru`      | `ru`      | `_ru`      | `ru_ru`                                     | 次要     | [3gf8jv4dv](https://github.com/3gf8jv4dv) |
@@ -131,7 +130,6 @@ HMCL 的维护者会替你完成其他步骤。
 - 英语: `README.md`
 - 中文 (简体): `README_zh.md`
 - 中文 (繁体): `README_zh_Hant.md`
-- 中文 (文言): `README_lzh.md`
 
 除了本地化文件，HMCL 还支持本地化 JSON 中的部分文本字段。JSON 中的本地化文本使用以下格式:
 
@@ -198,9 +196,7 @@ HMCL 的维护者会替你完成其他步骤。
       例如，如果当前语言代码为 `en` (英语)，则当前拼写脚本会被指定为 `Latn` (拉丁文);
       如果当前语言代码为 `ru` (俄语)，则当前拼写脚本会被指定为 `Cyrl` (西里尔文)。
 
-   3. 如果当前语言代码是 `lzh` (文言)，则将当前拼写脚本指定为 `Hant` (繁体汉字)。
-
-   4. 如果当前语言代码是 `zh` 或 `zh` 的子语言，则检查当前国家/地区代码是否为 `TW`、`HK`、`MO` 之一。
+   3. 如果当前语言代码是 `zh` 或 `zh` 的子语言，则检查当前国家/地区代码是否为 `TW`、`HK`、`MO` 之一。
       如果结果为真，则将当前拼写脚本指定为 `Hant` (繁体汉字)；否则将当前拼写脚本指定为 `Hans` (简体汉字)。
 
 在对语言代码细化推导完成后，HMCL 会开始根据此语言标签推导出一个语言标签列表。
@@ -278,14 +274,6 @@ HMCL 总是会将 `zh-CN` 加入所有中文环境的搜索列表中，将 `zh-T
     9.  `zh`
     10. `zh-CN`
     11. `und`
-- `lzh`:
-    1. `lzh-Hant`
-    2. `lzh`
-    3. `zh-Hant`
-    4. `zh-TW`
-    5. `zh`
-    6. `zh-CN`
-    7. `und`
 
 ## 自动同步文档内容
 
@@ -309,7 +297,7 @@ HMCL 总是会将 `zh-CN` 加入所有中文环境的搜索列表中，将 `zh-T
 随后执行 `./gradlew updateDocuments`，这两行内容会被自动替换为类似这样的跳转链接:
 
 ```markdown
-**English** (**Standard**, [uʍoᗡ ǝpᴉsd∩](README_en_Qabs.md)) | 中文 ([简体](README_zh.md), [繁體](README_zh_Hant.md), [文言](README_lzh.md)) | [日本語](README_ja.md) | [español](README_es.md) | [русский](README_ru.md) | [українська](README_uk.md)
+**English** (**Standard**, [uʍoᗡ ǝpᴉsd∩](README_en_Qabs.md)) | 中文 ([简体](README_zh.md), [繁體](README_zh_Hant.md)) | [日本語](README_ja.md) | [español](README_es.md) | [русский](README_ru.md) | [українська](README_uk.md)
 ```
 
 关于宏的更多内容，请见 [MacroProcessor.java](../buildSrc/src/main/java/org/jackhuang/hmcl/gradle/docs/MacroProcessor.java)。
