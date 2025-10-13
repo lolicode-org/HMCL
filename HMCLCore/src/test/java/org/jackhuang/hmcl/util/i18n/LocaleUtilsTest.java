@@ -63,9 +63,6 @@ public final class LocaleUtilsTest {
         assertCandidateLocales("zh-Latn-CN", List.of("zh-Latn-CN", "zh-Latn", "zh-CN", "zh", "und"));
         assertCandidateLocales("zh-pinyin", List.of("zh-Latn-pinyin", "zh-Latn", "zh-pinyin", "zh", "zh-CN", "und"));
         assertCandidateLocales("zho", List.of("zh-Hans", "zh-CN", "zh", "und"));
-        assertCandidateLocales("lzh", List.of("lzh-Hant", "lzh", "zh-Hant", "zh-TW", "zh", "zh-CN", "und"));
-        assertCandidateLocales("lzh-Hant", List.of("lzh-Hant", "lzh", "zh-Hant", "zh-TW", "zh", "zh-CN", "und"));
-        assertCandidateLocales("lzh-Hans", List.of("lzh-Hans", "lzh", "zh-Hans", "zh-CN", "zh", "und"));
         assertCandidateLocales("cmn", List.of("cmn-Hans", "cmn", "zh-Hans", "zh-CN", "zh", "und"));
         assertCandidateLocales("cmn-Hans", List.of("cmn-Hans", "cmn", "zh-Hans", "zh-CN", "zh", "und"));
         assertCandidateLocales("yue", List.of("yue-Hans", "yue", "zh-Hans", "zh-CN", "zh", "und"));
@@ -99,7 +96,6 @@ public final class LocaleUtilsTest {
         assertTrue(LocaleUtils.isChinese(Locale.TRADITIONAL_CHINESE));
         assertTrue(LocaleUtils.isChinese(LocaleUtils.LOCALE_ZH_HANS));
         assertTrue(LocaleUtils.isChinese(LocaleUtils.LOCALE_ZH_HANT));
-        assertTrue(LocaleUtils.isChinese(Locale.forLanguageTag("lzh")));
         assertTrue(LocaleUtils.isChinese(Locale.forLanguageTag("cmn")));
         assertTrue(LocaleUtils.isChinese(Locale.forLanguageTag("cmn-Hans")));
         assertTrue(LocaleUtils.isChinese(Locale.forLanguageTag("yue")));
@@ -123,16 +119,12 @@ public final class LocaleUtilsTest {
         assertEquals("Hans", LocaleUtils.getScript(Locale.forLanguageTag("cmn")));
         assertEquals("Hans", LocaleUtils.getScript(Locale.forLanguageTag("cmn-Hans")));
         assertEquals("Hans", LocaleUtils.getScript(Locale.forLanguageTag("cmn-CN")));
-        assertEquals("Hans", LocaleUtils.getScript(Locale.forLanguageTag("lzh-Hans")));
 
         assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("zh-Hant")));
         assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("zh-TW")));
         assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("zh-HK")));
         assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("zh-MO")));
         assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("cmn-Hant")));
-        assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("lzh")));
-        assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("lzh-Hant")));
-        assertEquals("Hant", LocaleUtils.getScript(Locale.forLanguageTag("lzh-CN")));
 
         assertEquals("Latn", LocaleUtils.getScript(Locale.forLanguageTag("zh-pinyin")));
     }
@@ -204,7 +196,6 @@ public final class LocaleUtilsTest {
         assertNull(LocaleUtils.mapToISO2Language(null));
         assertNull(LocaleUtils.mapToISO2Language(""));
         assertNull(LocaleUtils.mapToISO2Language("cmn"));
-        assertNull(LocaleUtils.mapToISO2Language("lzh"));
         assertNull(LocaleUtils.mapToISO2Language("tlh"));
     }
 
@@ -212,7 +203,6 @@ public final class LocaleUtilsTest {
     public void testGetParentLanguage() {
         assertEquals("zh", LocaleUtils.getParentLanguage("cmn"));
         assertEquals("zh", LocaleUtils.getParentLanguage("yue"));
-        assertEquals("zh", LocaleUtils.getParentLanguage("lzh"));
 
         assertNull(LocaleUtils.getParentLanguage(""));
         assertNull(LocaleUtils.getParentLanguage("en"));

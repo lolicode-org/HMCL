@@ -16,7 +16,6 @@ HMCL 为多种语言提供本地化支持。
 | 英语 (颠倒) | `en-Qabs` | `en-Qabs` | `en_Qabs`  | `en_ud`                                     | 自动     |                                           |  
 | 中文 (简体) | `zh-Hans` | `zh`      | `_zh`      | `zh_cn`                                     | **主要** | [Glavo](https://github.com/Glavo)         |
 | 中文 (繁体) | `zh-Hant` | `zh-Hant` | `_zh_Hant` | `zh_tw` <br/> `zh_hk`                       | **主要** | [Glavo](https://github.com/Glavo)         |
-| 中文 (文言) | `lzh`     | `lzh`     | `_lzh`     | `lzh`                                       | 次要     |                                           |
 | 日语      | `ja`      | `ja`      | `_ja`      | `ja_jp`                                     | 次要     |                                           |
 | 西班牙语    | `es`      | `es`      | `_es`      | `es_es`                                     | 次要     | [3gf8jv4dv](https://github.com/3gf8jv4dv) |
 | 俄语      | `ru`      | `ru`      | `_ru`      | `ru_ru`                                     | 次要     | [3gf8jv4dv](https://github.com/3gf8jv4dv) |
@@ -131,7 +130,6 @@ HMCL 的维护者会替你完成其他步骤。
 - 英语: `README.md`
 - 中文 (简体): `README_zh.md`
 - 中文 (繁体): `README_zh_Hant.md`
-- 中文 (文言): `README_lzh.md`
 
 除了本地化文件，HMCL 还支持本地化 JSON 中的部分文本字段。JSON 中的本地化文本使用以下格式:
 
@@ -186,11 +184,11 @@ HMCL 的维护者会替你完成其他步骤。
 
 ### 对于中文的额外规则
 
-对于中文 (以及其子语言标签，例如文言文 (`lzh`)、普通话 (`cmn`)、粤语 (`yue`) 等等)，HMCL 有着额外的支持。
+对于中文 (以及其子语言标签，例如普通话 (`cmn`)、粤语 (`yue`) 等等)，HMCL 有着额外的支持。
 
 如果当前环境的语言为中文 (及其子语言)，且未指定书写脚本，那么 HMCL 会根据语言和地区标签推导出默认的书写脚本。
 
-对于语言为 `lzh` 或地区为 `TW`、`HK`、`MO` 的情况，默认书写脚本为繁体中文 (`Hant`)；
+对于地区为 `TW`、`HK`、`MO` 的情况，默认书写脚本为繁体中文 (`Hant`)；
 而对于其他语言和地区，默认书写脚本为简体中文 (`Hans`)。
 
 此外，HMCL 会将 `zh-CN` 加入所有中文环境的搜索列表中，将 `zh-TW` 加入所有繁体中文环境的搜索列表中，
@@ -226,12 +224,6 @@ HMCL 的维护者会替你完成其他步骤。
     5. `zh`
     6. `zh-CN`
     7. `und`
-- `lzh`:
-    1. `lzh-Hant`
-    2. `lzh`
-    3. `zh-Hant`
-    4. `zh`
-    5. `und`
 
 ## 自动同步文档内容
 
