@@ -56,7 +56,6 @@ import org.jackhuang.hmcl.ui.download.DownloadPage;
 import org.jackhuang.hmcl.ui.download.ModpackInstallWizardProvider;
 import org.jackhuang.hmcl.ui.main.LauncherSettingsPage;
 import org.jackhuang.hmcl.ui.main.RootPage;
-import org.jackhuang.hmcl.ui.terracotta.TerracottaPage;
 import org.jackhuang.hmcl.ui.versions.GameListPage;
 import org.jackhuang.hmcl.ui.versions.VersionPage;
 import org.jackhuang.hmcl.ui.versions.Versions;
@@ -111,7 +110,6 @@ public final class Controllers {
         return accountListPage;
     });
     private static Lazy<LauncherSettingsPage> settingsPage = new Lazy<>(LauncherSettingsPage::new);
-    private static Lazy<TerracottaPage> terracottaPage = new Lazy<>(TerracottaPage::new);
 
     private Controllers() {
     }
@@ -152,11 +150,6 @@ public final class Controllers {
     // FXThread
     public static DownloadPage getDownloadPage() {
         return downloadPage.get();
-    }
-
-    // FXThread
-    public static Node getTerracottaPage() {
-        return terracottaPage.get();
     }
 
     // FXThread
