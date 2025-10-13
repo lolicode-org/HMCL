@@ -61,3 +61,5 @@ hmcl-exported-logs-*
 /hmcl.json
 /.hmcl.json
 /.hmcl/
+
+/sign_pkcs8.key
