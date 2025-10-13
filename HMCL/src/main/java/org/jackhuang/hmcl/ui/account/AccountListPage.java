@@ -62,48 +62,6 @@ import static org.jackhuang.hmcl.util.i18n.I18n.i18n;
 import static org.jackhuang.hmcl.util.javafx.ExtendedProperties.createSelectedItemPropertyFor;
 
 public final class AccountListPage extends DecoratorAnimatedPage implements DecoratorPage {
-    static final BooleanProperty RESTRICTED = new SimpleBooleanProperty(true);
-
-    private static boolean isExemptedRegion() {
-        if ("Asia/Shanghai".equals(ZoneId.systemDefault().getId()))
-            return true;
-
-        // Check if the time zone is UTC+8
-        if (ZonedDateTime.now().getOffset().getTotalSeconds() == Duration.ofHours(8).toSeconds()) {
-            if ("CN".equals(LocaleUtils.SYSTEM_DEFAULT.getCountry()))
-                return true;
-
-            if (OperatingSystem.CURRENT_OS == OperatingSystem.WINDOWS && NativeUtils.USE_JNA) {
-                Kernel32 kernel32 = Kernel32.INSTANCE;
-
-                // https://learn.microsoft.com/windows/win32/intl/table-of-geographical-locations
-                if (kernel32 != null && kernel32.GetUserGeoID(WinConstants.GEOCLASS_NATION) == 45) // China
-                    return true;
-            }
-        }
-
-        return false;
-    }
-
-    static {
-        String property = System.getProperty("hmcl.offline.auth.restricted", "auto");
-
-        if ("false".equals(property)
-                || "auto".equals(property) && isExemptedRegion()
-                || globalConfig().isEnableOfflineAccount())
-            RESTRICTED.set(false);
-        else
-            globalConfig().enableOfflineAccountProperty().addListener(new ChangeListener<Boolean>() {
-                @Override
-                public void changed(ObservableValue<? extends Boolean> o, Boolean oldValue, Boolean newValue) {
-                    if (newValue) {
-                        globalConfig().enableOfflineAccountProperty().removeListener(this);
-                        RESTRICTED.set(false);
-                    }
-                }
-            });
-    }
-
     private final ObservableList<AccountListItem> items;
     private final ReadOnlyObjectWrapper<State> state = new ReadOnlyObjectWrapper<>(State.fromTitle(i18n("account.manage")));
     private final ListProperty<Account> accounts = new SimpleListProperty<>(this, "accounts", FXCollections.observableArrayList());
@@ -201,27 +159,8 @@ public final class AccountListPage extends DecoratorAnimatedPage implements Deco
                     Bindings.bindContent(boxAuthServers.getChildren(), authServerItems);
 
                     ClassTitle title = new ClassTitle(i18n("account.create").toUpperCase(Locale.ROOT));
-                    if (RESTRICTED.get()) {
-                        VBox wrapper = new VBox(offlineItem, boxAuthServers);
-                        wrapper.setPadding(Insets.EMPTY);
-                        FXUtils.installFastTooltip(wrapper, i18n("account.login.restricted"));
 
-                        offlineItem.setDisable(true);
-                        boxAuthServers.setDisable(true);
-
-                        boxMethods.getChildren().setAll(title, microsoftItem, wrapper);
-
-                        holder = FXUtils.onWeakChange(RESTRICTED, value -> {
-                            if (!value) {
-                                holder = null;
-                                offlineItem.setDisable(false);
-                                boxAuthServers.setDisable(false);
-                                boxMethods.getChildren().setAll(title, microsoftItem, offlineItem, boxAuthServers);
-                            }
-                        });
-                    } else {
-                        boxMethods.getChildren().setAll(title, microsoftItem, offlineItem, boxAuthServers);
-                    }
+                    boxMethods.getChildren().setAll(title, microsoftItem, offlineItem, boxAuthServers);
                 }
 
                 AdvancedListItem addAuthServerItem = new AdvancedListItem();
