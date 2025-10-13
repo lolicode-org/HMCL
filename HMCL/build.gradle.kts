@@ -196,6 +196,7 @@ val generateLatestJson by tasks.registering {
 
     inputs.file(jarPath)
     inputs.property("version", project.version.toString())
+    outputs.file(outputFile)
 
     doLast {
         val jarFile = jarPath
@@ -445,4 +446,40 @@ tasks.register<ParseModDataTask>("parseModData") {
 tasks.register<ParseModDataTask>("parseModPackData") {
     inputFile.set(layout.projectDirectory.file("modpack.json"))
     outputFile.set(layout.projectDirectory.file("src/main/resources/assets/modpack_data.txt"))
+}
+
+tasks.register<Exec>("deployToRemote") {
+    dependsOn(tasks.shadowJar, generateLatestJson)
+
+    group = "deployment"
+    description = "Deploy JAR and JSON files to remote host via SCP"
+
+    val remoteHost = System.getenv("DEPLOY_HOST") ?: ""
+    val remoteUser = System.getenv("DEPLOY_USER") ?: ""
+    val remotePath = System.getenv("DEPLOY_PATH") ?: ""
+    val sshKey = System.getenv("DEPLOY_SSH_KEY") ?: ""
+
+    onlyIf {
+        if (remoteHost.isBlank() || remoteUser.isBlank() || remotePath.isBlank()) {
+            logger.warn("Deployment skipped: DEPLOY_HOST, DEPLOY_USER, and DEPLOY_PATH must be set")
+            false
+        } else {
+            true
+        }
+    }
+
+    doFirst {
+        logger.quiet("Deploying to $remoteUser@$remoteHost:$remotePath")
+    }
+
+    commandLine = buildList {
+        add("scp")
+        if (sshKey.isNotBlank()) {
+            add("-i")
+            add(sshKey)
+        }
+        add(jarPath.absolutePath)
+        add(generateLatestJson.get().outputs.files.singleFile.absolutePath)
+        add("$remoteUser@$remoteHost:$remotePath")
+    }
 }
