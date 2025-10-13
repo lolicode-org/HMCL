@@ -29,6 +29,7 @@ val versionRoot = System.getenv("VERSION_ROOT") ?: projectConfig.getProperty("ve
 val microsoftAuthId = System.getenv("MICROSOFT_AUTH_ID") ?: ""
 val microsoftAuthSecret = System.getenv("MICROSOFT_AUTH_SECRET") ?: ""
 val curseForgeApiKey = System.getenv("CURSEFORGE_API_KEY") ?: ""
+val updateURL = System.getenv("HMCL_UPDATE_URL") ?: projectConfig.getProperty("updateURL") ?: ""
 
 val launcherExe = System.getenv("HMCL_LAUNCHER_EXE") ?: ""
 
@@ -162,6 +163,7 @@ val hmclProperties = buildList {
     add("hmcl.microsoft.auth.id" to microsoftAuthId)
     add("hmcl.microsoft.auth.secret" to microsoftAuthSecret)
     add("hmcl.curseforge.apikey" to curseForgeApiKey)
+    add("hmcl.update.url" to updateURL)
     add("hmcl.authlib-injector.version" to libs.authlib.injector.get().version!!)
 }
 
@@ -187,6 +189,35 @@ tasks.jar {
 }
 
 val jarPath = tasks.jar.get().archiveFile.get().asFile
+
+val generateLatestJson by tasks.registering {
+    dependsOn(tasks.shadowJar)
+    val outputFile = layout.buildDirectory.file("latest.json")
+
+    inputs.file(jarPath)
+    inputs.property("version", project.version.toString())
+
+    doLast {
+        val jarFile = jarPath
+        val sha1 = digest("SHA-1", jarFile.readBytes())
+            .joinToString("") { "%02x".format(it) }
+
+        val json = buildString {
+            append('{')
+            append("\"jar\":\"${System.getenv("JAR_HOST_URL")}${jarFile.name}\",")
+            append("\"jarsha1\":\"$sha1\",")
+            append("\"universal\":\"https://github.com/lolicode-org/HMCL\",")
+            append("\"version\":\"${project.version}\",")
+            append("\"force\":false")
+            append('}')
+        }
+
+        outputFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(json)
+        }
+    }
+}
 
 tasks.shadowJar {
     dependsOn(createPropertiesFile)
@@ -280,6 +311,7 @@ val makeExecutables by tasks.registering {
 
 tasks.build {
     dependsOn(makeExecutables)
+    dependsOn(generateLatestJson)
 }
 
 fun parseToolOptions(options: String?): MutableList<String> {
