@@ -209,7 +209,7 @@ val generateLatestJson by tasks.registering {
             append("\"jarsha1\":\"$sha1\",")
             append("\"universal\":\"https://github.com/lolicode-org/HMCL\",")
             append("\"version\":\"${project.version}\",")
-            append("\"force\":false")
+            append("\"force\":true")
             append('}')
         }
 
