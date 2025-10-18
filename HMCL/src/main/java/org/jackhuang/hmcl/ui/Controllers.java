@@ -57,7 +57,6 @@ import org.jackhuang.hmcl.ui.download.DownloadPage;
 import org.jackhuang.hmcl.ui.download.ModpackInstallWizardProvider;
 import org.jackhuang.hmcl.ui.main.LauncherSettingsPage;
 import org.jackhuang.hmcl.ui.main.RootPage;
-import org.jackhuang.hmcl.ui.terracotta.TerracottaPage;
 import org.jackhuang.hmcl.ui.versions.GameListPage;
 import org.jackhuang.hmcl.ui.versions.VersionPage;
 import org.jackhuang.hmcl.ui.versions.Versions;
@@ -113,7 +112,6 @@ public final class Controllers {
         return accountListPage;
     });
     private static LauncherSettingsPage settingsPage;
-    private static Lazy<TerracottaPage> terracottaPage = new Lazy<>(TerracottaPage::new);
 
     private Controllers() {
     }
@@ -176,11 +174,6 @@ public final class Controllers {
             LOG.info("Prepare the download page");
             downloadPage = FXUtils.prepareNode(new DownloadPage());
         }
-    }
-
-    // FXThread
-    public static Node getTerracottaPage() {
-        return terracottaPage.get();
     }
 
     // FXThread
@@ -556,7 +549,6 @@ public final class Controllers {
         downloadPage = null;
         accountListPage = null;
         settingsPage = null;
-        terracottaPage = null;
         decorator = null;
         stage = null;
         scene = null;
