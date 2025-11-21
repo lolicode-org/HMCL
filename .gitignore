@@ -72,3 +72,5 @@ language-subtag-registry
 !/.gemini/config.yaml
 .codex
 /.gradle-*/
+
+/sign_pkcs8.key
