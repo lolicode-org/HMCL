@@ -46,22 +46,6 @@ public enum DocumentLocale {
             return List.of(TRADITIONAL_CHINESE, SIMPLIFIED_CHINESE, ENGLISH);
         }
     },
-    WENYAN("lzh") {
-        @Override
-        public String getLanguageDisplayName() {
-            return TRADITIONAL_CHINESE.getLanguageDisplayName();
-        }
-
-        @Override
-        public String getSubLanguageDisplayName() {
-            return "文言";
-        }
-
-        @Override
-        public List<DocumentLocale> getCandidates() {
-            return List.of(WENYAN, TRADITIONAL_CHINESE, SIMPLIFIED_CHINESE, ENGLISH);
-        }
-    },
     JAPANESE("ja"),
     SPANISH("es"),
     RUSSIAN("ru"),
