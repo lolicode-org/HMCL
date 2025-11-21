@@ -45,9 +45,6 @@ public abstract class CheckTranslations extends DefaultTask {
     @InputFile
     public abstract RegularFileProperty getTraditionalChineseFile();
 
-    @InputFile
-    public abstract RegularFileProperty getClassicalChineseFile();
-
     @TaskAction
     public void run() throws IOException {
         Checker checker = new Checker();
@@ -55,7 +52,6 @@ public abstract class CheckTranslations extends DefaultTask {
         var english = new PropertiesFile(getEnglishFile());
         var simplifiedChinese = new PropertiesFile(getSimplifiedChineseFile());
         var traditionalChinese = new PropertiesFile(getTraditionalChineseFile());
-        var classicalChinese = new PropertiesFile(getClassicalChineseFile());
 
         simplifiedChinese.forEach((key, value) -> {
             checker.checkKeyExists(english, key);
@@ -71,12 +67,6 @@ public abstract class CheckTranslations extends DefaultTask {
         traditionalChinese.forEach((key, value) -> {
             checker.checkMisspelled(traditionalChinese, key, value, "(", "（");
             checker.checkMisspelled(traditionalChinese, key, value, ")", "）");
-        });
-
-        classicalChinese.forEach((key, value) -> {
-            checker.checkMisspelled(classicalChinese, key, value, "綫", "線");
-            checker.checkMisspelled(classicalChinese, key, value, "爲", "為");
-            checker.checkMisspelled(classicalChinese, key, value, "啟", "啓");
         });
 
         checker.check();
