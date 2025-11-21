@@ -363,7 +363,6 @@ tasks.register<CheckTranslations>("checkTranslations") {
     englishFile.set(dir.file("I18N.properties"))
     simplifiedChineseFile.set(dir.file("I18N_zh_CN.properties"))
     traditionalChineseFile.set(dir.file("I18N_zh.properties"))
-    classicalChineseFile.set(dir.file("I18N_lzh.properties"))
 }
 
 // l10n

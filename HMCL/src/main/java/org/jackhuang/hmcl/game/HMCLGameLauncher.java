@@ -116,9 +116,6 @@ public final class HMCLGameLauncher extends DefaultLauncher {
             case "ru" -> "ru_RU";
             case "uk" -> "uk_UA";
             case "zh" -> {
-                if ("lzh".equals(locale.getLanguage()) && gameVersion.compareTo("1.16") >= 0)
-                    yield "lzh";
-
                 String script = LocaleUtils.getScript(locale);
                 if ("Hant".equals(script)) {
                     if ((region.equals("HK") || region.equals("MO") && gameVersion.compareTo("1.16") >= 0))
