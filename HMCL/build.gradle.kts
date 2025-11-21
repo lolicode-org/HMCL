@@ -29,6 +29,7 @@ val versionRoot = System.getenv("VERSION_ROOT") ?: projectConfig.getProperty("ve
 val microsoftAuthId = System.getenv("MICROSOFT_AUTH_ID") ?: ""
 val microsoftAuthSecret = System.getenv("MICROSOFT_AUTH_SECRET") ?: ""
 val curseForgeApiKey = System.getenv("CURSEFORGE_API_KEY") ?: ""
+val updateURL = System.getenv("HMCL_UPDATE_URL") ?: projectConfig.getProperty("updateURL") ?: ""
 
 val launcherExe = System.getenv("HMCL_LAUNCHER_EXE") ?: ""
 
@@ -40,7 +41,7 @@ if (buildNumber != null) {
         "$versionRoot.$buildNumber"
     }
 } else {
-    val shortCommit = System.getenv("GITHUB_SHA")?.lowercase()?.substring(0, 7)
+    val shortCommit = currentGitShortSha()
     version = if (shortCommit.isNullOrBlank()) {
         "$versionRoot.SNAPSHOT"
     } else if (isOfficial) {
@@ -67,6 +68,21 @@ dependencies {
 }
 
 fun digest(algorithm: String, bytes: ByteArray): ByteArray = MessageDigest.getInstance(algorithm).digest(bytes)
+
+fun currentGitShortSha(len: Int = 7): String? {
+    val envSha = System.getenv("GITHUB_SHA")?.lowercase()?.take(len)
+    if (!envSha.isNullOrBlank()) return envSha
+
+    return try {
+        val proc = ProcessBuilder("git", "rev-parse", "--short=$len", "HEAD")
+            .redirectErrorStream(true)
+            .start()
+        val output = proc.inputStream.bufferedReader().readText().trim().lowercase()
+        output.takeIf { it.isNotBlank() }
+    } catch (_: Exception) {
+        null
+    }
+}
 
 fun createChecksum(file: File) {
     val algorithms = linkedMapOf(
@@ -147,6 +163,7 @@ val hmclProperties = buildList {
     add("hmcl.microsoft.auth.id" to microsoftAuthId)
     add("hmcl.microsoft.auth.secret" to microsoftAuthSecret)
     add("hmcl.curseforge.apikey" to curseForgeApiKey)
+    add("hmcl.update.url" to updateURL)
     add("hmcl.authlib-injector.version" to libs.authlib.injector.get().version!!)
 }
 
@@ -172,6 +189,36 @@ tasks.jar {
 }
 
 val jarPath = tasks.jar.get().archiveFile.get().asFile
+
+val generateLatestJson by tasks.registering {
+    dependsOn(tasks.shadowJar)
+    val outputFile = layout.buildDirectory.file("latest.json")
+
+    inputs.file(jarPath)
+    inputs.property("version", project.version.toString())
+    outputs.file(outputFile)
+
+    doLast {
+        val jarFile = jarPath
+        val sha1 = digest("SHA-1", jarFile.readBytes())
+            .joinToString("") { "%02x".format(it) }
+
+        val json = buildString {
+            append('{')
+            append("\"jar\":\"${System.getenv("JAR_HOST_URL")}${jarFile.name}\",")
+            append("\"jarsha1\":\"$sha1\",")
+            append("\"universal\":\"https://github.com/lolicode-org/HMCL\",")
+            append("\"version\":\"${project.version}\",")
+            append("\"force\":true")
+            append('}')
+        }
+
+        outputFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(json)
+        }
+    }
+}
 
 tasks.shadowJar {
     dependsOn(createPropertiesFile)
@@ -265,6 +312,7 @@ val makeExecutables by tasks.registering {
 
 tasks.build {
     dependsOn(makeExecutables)
+    dependsOn(generateLatestJson)
 }
 
 fun parseToolOptions(options: String?): MutableList<String> {
@@ -398,4 +446,40 @@ tasks.register<ParseModDataTask>("parseModData") {
 tasks.register<ParseModDataTask>("parseModPackData") {
     inputFile.set(layout.projectDirectory.file("modpack.json"))
     outputFile.set(layout.projectDirectory.file("src/main/resources/assets/modpack_data.txt"))
+}
+
+tasks.register<Exec>("deployToRemote") {
+    dependsOn(tasks.shadowJar, generateLatestJson)
+
+    group = "deployment"
+    description = "Deploy JAR and JSON files to remote host via SCP"
+
+    val remoteHost = System.getenv("DEPLOY_HOST") ?: ""
+    val remoteUser = System.getenv("DEPLOY_USER") ?: ""
+    val remotePath = System.getenv("DEPLOY_PATH") ?: ""
+    val sshKey = System.getenv("DEPLOY_SSH_KEY") ?: ""
+
+    onlyIf {
+        if (remoteHost.isBlank() || remoteUser.isBlank() || remotePath.isBlank()) {
+            logger.warn("Deployment skipped: DEPLOY_HOST, DEPLOY_USER, and DEPLOY_PATH must be set")
+            false
+        } else {
+            true
+        }
+    }
+
+    doFirst {
+        logger.quiet("Deploying to $remoteUser@$remoteHost:$remotePath")
+    }
+
+    commandLine = buildList {
+        add("scp")
+        if (sshKey.isNotBlank()) {
+            add("-i")
+            add(sshKey)
+        }
+        add(jarPath.absolutePath)
+        add(generateLatestJson.get().outputs.files.singleFile.absolutePath)
+        add("$remoteUser@$remoteHost:$remotePath")
+    }
 }
