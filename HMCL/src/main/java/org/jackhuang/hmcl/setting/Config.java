@@ -668,19 +668,19 @@ public final class Config extends ObservableSetting {
         return authlibInjectorServers;
     }
 
-    @SerializedName("addedLittleSkin")
-    private final BooleanProperty addedLittleSkin = new SimpleBooleanProperty(false);
+    @SerializedName("addedDefaultAuthServer")
+    private final BooleanProperty addedDefaultAuthServer = new SimpleBooleanProperty(false);
 
-    public BooleanProperty addedLittleSkinProperty() {
-        return addedLittleSkin;
+    public BooleanProperty addedDefaultAuthServerProperty() {
+        return addedDefaultAuthServer;
     }
 
-    public boolean isAddedLittleSkin() {
-        return addedLittleSkin.get();
+    public boolean isAddedDefaultAuthServer() {
+        return addedDefaultAuthServer.get();
     }
 
-    public void setAddedLittleSkin(boolean addedLittleSkin) {
-        this.addedLittleSkin.set(addedLittleSkin);
+    public void setAddedDefaultAuthServer(boolean addedDefaultAuthServer) {
+        this.addedDefaultAuthServer.set(addedDefaultAuthServer);
     }
 
     /**
