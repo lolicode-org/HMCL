@@ -36,6 +36,7 @@ import org.jackhuang.hmcl.auth.yggdrasil.RemoteAuthenticationException;
 import org.jackhuang.hmcl.game.OAuthServer;
 import org.jackhuang.hmcl.task.Schedulers;
 import org.jackhuang.hmcl.util.FileSaver;
+import org.jackhuang.hmcl.util.StringUtils;
 import org.jackhuang.hmcl.util.io.JarUtils;
 import org.jackhuang.hmcl.util.skin.InvalidSkinException;
 
@@ -197,14 +198,15 @@ public final class Accounts {
         if (initialized)
             throw new IllegalStateException("Already initialized");
 
-        if (!config().isAddedLittleSkin()) {
-            AuthlibInjectorServer littleSkin = new AuthlibInjectorServer("https://littleskin.cn/api/yggdrasil/");
+        String defaultAuthServerUrl = JarUtils.getAttribute("hmcl.authserver.url", "");
+        if (!config().isAddedDefaultAuthServer() && StringUtils.isNotBlank(defaultAuthServerUrl)) {
+            AuthlibInjectorServer defaultAuthServer = new AuthlibInjectorServer(defaultAuthServerUrl);
 
-            if (config().getAuthlibInjectorServers().stream().noneMatch(it -> littleSkin.getUrl().equals(it.getUrl()))) {
-                config().getAuthlibInjectorServers().add(0, littleSkin);
+            if (config().getAuthlibInjectorServers().stream().noneMatch(it -> defaultAuthServer.getUrl().equals(it.getUrl()))) {
+                config().getAuthlibInjectorServers().add(0, defaultAuthServer);
             }
 
-            config().setAddedLittleSkin(true);
+            config().setAddedDefaultAuthServer(true);
         }
 
         loadGlobalAccountStorages();

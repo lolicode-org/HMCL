@@ -30,6 +30,7 @@ val microsoftAuthId = System.getenv("MICROSOFT_AUTH_ID") ?: ""
 val microsoftAuthSecret = System.getenv("MICROSOFT_AUTH_SECRET") ?: ""
 val curseForgeApiKey = System.getenv("CURSEFORGE_API_KEY") ?: ""
 val updateURL = System.getenv("HMCL_UPDATE_URL") ?: projectConfig.getProperty("updateURL") ?: ""
+val authServerURL = System.getenv("AUTHLIB_INJECTOR_AUTH_SERVER_URL") ?: projectConfig.getProperty("authlibInjectorAuthServerURL") ?: ""
 
 val launcherExe = System.getenv("HMCL_LAUNCHER_EXE") ?: ""
 
@@ -170,6 +171,7 @@ val hmclProperties = buildList {
     add("hmcl.microsoft.auth.secret" to microsoftAuthSecret)
     add("hmcl.curseforge.apikey" to curseForgeApiKey)
     add("hmcl.update.url" to updateURL)
+    add("hmcl.authserver.url" to authServerURL)
     add("hmcl.authlib-injector.version" to libs.authlib.injector.get().version!!)
 }
 
