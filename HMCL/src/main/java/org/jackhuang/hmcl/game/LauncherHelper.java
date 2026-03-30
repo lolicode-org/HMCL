@@ -205,7 +205,7 @@ public final class LauncherHelper {
                             || setting.isNoJVMArgs()
                             || setting.isNoOptimizingJVMArgs()
                             || Boolean.TRUE.equals(config().getShownTips().get(LWJGL_3_4_1_TIP))
-                            || !NativePatcher.needPatchMemoryUtil(version.get(), javaVersionRef.get().getParsedVersion())) {
+                            || !NativePatcher.needPatchMemoryUtil(version.get(), javaVersionRef.get().getParsedVersion(), repository)) {
                         return Task.completed(null);
                     } else {
                         CompletableFuture<Void> future = new CompletableFuture<>();
