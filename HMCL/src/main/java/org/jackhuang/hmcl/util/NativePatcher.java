@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,6 +66,9 @@ public final class NativePatcher {
     }
 
     // https://github.com/LWJGL/lwjgl3/issues/1111
+    // SHA-1 hash of the original unpatched lwjgl-3.4.1.jar from Maven Central
+    private static final String LWJGL_3_4_1_ORIGINAL_SHA1 = "6105690714874b995aa7812e4f7732a21109276c";
+
     public static boolean needPatchMemoryUtil(Version version, int javaVersion) {
         return javaVersion >= 25 && javaVersion <= 26 && version.getLibraries().stream().anyMatch(library ->
                 "org.lwjgl".equals(library.getGroupId())
@@ -71,6 +76,58 @@ public final class NativePatcher {
                         && "3.4.1".equals(library.getVersion())
                         && library.getClassifier() == null
         );
+    }
+
+    /**
+     * Check if the lwjgl-3.4.1 library needs patching by verifying its hash.
+     * This prevents patching externally modified libraries.
+     * 
+     * @param version the game version
+     * @param javaVersion the Java version
+     * @param repository the game repository to locate library files
+     * @return true if the library needs patching (it's the original unpatched version)
+     */
+    public static boolean needPatchMemoryUtil(Version version, int javaVersion, GameRepository repository) {
+        if (javaVersion < 25 || javaVersion > 26) {
+            return false;
+        }
+
+        Library lwjglLibrary = version.getLibraries().stream()
+                .filter(library ->
+                        "org.lwjgl".equals(library.getGroupId())
+                                && "lwjgl".equals(library.getArtifactId())
+                                && "3.4.1".equals(library.getVersion())
+                                && library.getClassifier() == null
+                )
+                .findFirst()
+                .orElse(null);
+
+        if (lwjglLibrary == null) {
+            return false;
+        }
+
+        try {
+            Path libraryPath = repository.getLibraryFile(version, lwjglLibrary);
+            if (!Files.isRegularFile(libraryPath)) {
+                // File doesn't exist yet, will be downloaded - assume it needs patching
+                return true;
+            }
+
+            // Verify the hash matches the original unpatched version
+            String actualSha1 = DigestUtils.digestToString("SHA-1", libraryPath);
+            boolean isOriginal = LWJGL_3_4_1_ORIGINAL_SHA1.equalsIgnoreCase(actualSha1);
+            
+            if (!isOriginal) {
+                LOG.info("lwjgl-3.4.1.jar hash mismatch (expected: " + LWJGL_3_4_1_ORIGINAL_SHA1 + 
+                        ", actual: " + actualSha1 + "), skipping patch (likely already patched or modified)");
+            }
+            
+            return isOriginal;
+        } catch (Exception e) {
+            LOG.warning("Failed to verify lwjgl-3.4.1.jar hash, will attempt to patch anyway", e);
+            // On error, fall back to attempting the patch (safe default)
+            return true;
+        }
     }
 
     public static Version patchNative(DefaultGameRepository repository,
