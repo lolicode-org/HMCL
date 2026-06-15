@@ -1,0 +1,73 @@
+{
+  "name": "HMCL",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspace/HMCL",
+  "workspaceMount": "type=bind,source=${localWorkspaceFolder},target=/workspace/HMCL,relabel=private",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "runArgs": [
+    "--userns=keep-id",
+    "--security-opt=label=type:container_runtime_t",
+  ],
+  "mounts": [
+    "type=volume,source=hmcl-gradle-cache,target=/home/vscode/.gradle",
+    "type=volume,source=hmcl-maven-cache,target=/home/vscode/.m2",
+    "type=volume,source=hmcl-idea-cache,target=/home/vscode/.cache/JetBrains",
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": true,
+      "installZsh": true,
+      "upgradePackages": false
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "25",
+      "jdkDistro": "zulu",
+      "installGradle": false,
+      "installMaven": false
+    },
+    "ghcr.io/devcontainers/features/desktop-lite:1": {
+      "password": "noPassword",
+      "webPort": "6080",
+      "vncPort": "5901"
+    }
+  },
+  "containerEnv": {
+    "DISPLAY": ":1",
+    "GRADLE_USER_HOME": "/home/vscode/.gradle",
+    "MAVEN_OPTS": "-Dmaven.repo.local=/home/vscode/.m2/repository"
+  },
+  "forwardPorts": [
+    6080,
+    5901
+  ],
+  "portsAttributes": {
+    "6080": {
+      "label": "HMCL desktop",
+      "onAutoForward": "notify",
+      "requireLocalPort": true
+    },
+    "5901": {
+      "label": "HMCL VNC",
+      "onAutoForward": "silent",
+      "requireLocalPort": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "JetBrains.kotlin-server",
+        "redhat.vscode-xml",
+        "tamasfe.even-better-toml"
+      ]
+    },
+    "jetbrains": {
+      "backend": "Idea"
+    }
+  },
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode",
+  "initializeCommand": "bash -c \"sudo chown -R vscode:vscode /home/vscode/{.gradle,.m2,.cache/JetBrains}\""
+}
